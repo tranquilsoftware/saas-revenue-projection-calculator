@@ -1,0 +1,113 @@
+@import "tailwindcss";
+@config '../tailwind.config.js';
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --background: rgb(15, 23, 42);        /* Dark blue-gray */
+  --foreground: rgb(241, 245, 249);     /* Light gray */
+  
+  --card: rgb(15, 23, 42);
+  --card-foreground: rgb(241, 245, 249);
+  
+  --popover: rgb(15, 23, 42);
+  --popover-foreground: rgb(241, 245, 249);
+  
+  --primary: rgb(241, 245, 249);
+  --primary-foreground: rgb(30, 41, 59);
+  
+  --secondary: rgb(30, 41, 59);         /* Lighter blue-gray */
+  --secondary-foreground: rgb(241, 245, 249);
+  
+  --muted: rgb(30, 41, 59);
+  --muted-foreground: rgb(148, 163, 184);
+  
+  --accent: rgb(30, 41, 59);
+  --accent-foreground: rgb(241, 245, 249);
+  
+  --destructive: rgb(127, 29, 29);      /* Dark red */
+  --destructive-foreground: rgb(241, 245, 249);
+  
+  --border: rgb(30, 41, 59);
+  --input: rgb(30, 41, 59);
+  --ring: rgb(203, 213, 225);
+  
+  --radius: 0.5rem;
+}
+
+@layer base {
+  html, body {
+    overflow-x: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  a {
+    font-weight: 500;
+    color: #646cff;
+    text-decoration: inherit;
+  }
+  a:hover {
+    color: #535bf2;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+
+  h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+  }
+
+  button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
+  }
+  button:hover {
+    border-color: #646cff;
+  }
+  button:focus,
+  button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
