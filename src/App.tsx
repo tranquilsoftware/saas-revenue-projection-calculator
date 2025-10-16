@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
 // Types
@@ -361,6 +361,7 @@ interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string | number;
   subtitle?: string;
   highlight?: boolean;
+  className?: string;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({ 
@@ -369,16 +370,25 @@ const MetricCard: React.FC<MetricCardProps> = ({
   subtitle, 
   highlight = false,
   className = '',
-  ...props 
 }) => (
-  <div className={`p-6 rounded-lg border ${highlight ? 'bg-primary/10 border-primary' : 'bg-secondary border-border'}`}>
+  <div className={`p-6 rounded-lg border ${highlight ? 'bg-primary/10 border-primary' : 'bg-secondary border-border'} ${className}`}>
     <div className="text-sm text-muted-foreground mb-1">{title}</div>
     <div className={`text-3xl font-bold mb-1 ${highlight ? 'text-primary' : 'text-foreground'}`}>{value}</div>
     {subtitle && <div className="text-xs text-muted-foreground">{subtitle}</div>}
   </div>
 );
 
-const BigPictureCard: React.FC<{ metrics: BusinessMetrics }> = ({ metrics }) => {
+const BigPictureCard: React.FC<{ 
+  metrics: BusinessMetrics;
+  finalMonth?: MonthData;
+ }> = ({ metrics, finalMonth }) => {
+  if (!finalMonth) {
+    return (
+      <div className="bg-gradient-to-br from-primary/20 to-purple-500/20 border-2 border-primary/50 rounded-xl p-8 shadow-xl">
+        <h3 className="text-2xl font-bold text-foreground mb-6">Loading data...</h3>
+      </div>
+    );
+  }
   return (
     <div className="bg-gradient-to-br from-primary/20 to-purple-500/20 border-2 border-primary/50 rounded-xl p-8 shadow-xl">
       <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
@@ -429,6 +439,18 @@ const BigPictureCard: React.FC<{ metrics: BusinessMetrics }> = ({ metrics }) => 
           <div className="text-sm text-muted-foreground mb-1">Average ARPU</div>
           <div className="text-3xl font-bold text-primary">${metrics.averageArpu}</div>
           <div className="text-xs text-muted-foreground mt-1">Per user per month</div>
+        </div>
+
+        <div>
+          <div className="text-sm text-muted-foreground mb-1">Final Month MRR</div>
+          <div className="text-3xl font-bold text-primary">${finalMonth.mrr.toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground mt-1">Monthly Recurring Revenue</div>
+        </div>
+
+        <div>
+          <div className="text-sm text-muted-foreground mb-1">Active Customers</div>
+          <div className="text-3xl font-bold text-primary">{finalMonth.customers.toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground mt-1">At month 60</div>
         </div>
         
         <div>
@@ -532,7 +554,7 @@ const InsightsCard: React.FC<{
     <div className="bg-card border-2 border-purple-500/50 rounded-xl p-8 shadow-xl">
       <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
         <span className="text-3xl">💡</span>
-        AI-Powered Insights
+        Insights
       </h3>
       
       <div className="space-y-4">
@@ -552,13 +574,40 @@ const InsightsCard: React.FC<{
       </div>
       
       {finalMonth && (
-        <div className="mt-6 p-4 bg-background/50 rounded-lg border border-border">
-          <div className="text-sm font-semibold text-foreground mb-2">📈 Growth Summary:</div>
-          <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-            <div>• Total customers: {finalMonth.customers.toLocaleString()}</div>
-            <div>• Net profit: ${finalMonth.profit.toLocaleString()}</div>
-            <div>• Expansion revenue: ${finalMonth.expansionRevenue.toLocaleString()}/mo</div>
-            <div>• Operating costs: ${finalMonth.operatingCosts.toLocaleString()}/mo</div>
+        <div className="mt-6 p-6 rounded-lg border-l-4 border-purple-500 bg-purple-500/10">
+          <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <span className="text-xl">📈</span>
+            Growth Summary
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div className="flex items-start gap-2">
+              <span className="text-muted-foreground">•</span>
+              <div>
+                <div className="text-foreground font-medium">{finalMonth.customers.toLocaleString()}</div>
+                <div className="text-muted-foreground text-xs">Total customers</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-muted-foreground">•</span>
+              <div>
+                <div className="text-foreground font-medium">${finalMonth.profit.toLocaleString()}</div>
+                <div className="text-muted-foreground text-xs">Net profit</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-muted-foreground">•</span>
+              <div>
+                <div className="text-foreground font-medium">${finalMonth.expansionRevenue.toLocaleString()}<span className="text-muted-foreground text-xs">/mo</span></div>
+                <div className="text-muted-foreground text-xs">Expansion revenue</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-muted-foreground">•</span>
+              <div>
+                <div className="text-foreground font-medium">${finalMonth.operatingCosts.toLocaleString()}<span className="text-muted-foreground text-xs">/mo</span></div>
+                <div className="text-muted-foreground text-xs">Operating costs</div>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -622,7 +671,7 @@ const SaaSCalculator: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -636,8 +685,11 @@ const SaaSCalculator: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Input Panel */}
           <div className="lg:col-span-1">
-            <div className="bg-card border border-border rounded-xl p-6 shadow-lg sticky top-8">
-              <h2 className="text-xl font-bold text-foreground mb-6">Configuration</h2>
+            <div className="bg-card border-2 border-purple-500/50 rounded-xl p-8 shadow-xl sticky top-8">
+              <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+                <span className="text-3xl">⚙️</span>
+                Configuration
+              </h2>
               
               <SliderField
                 label="Target Monthly Income"
@@ -704,105 +756,203 @@ const SaaSCalculator: React.FC = () => {
               <MetricCard
                 title="Time to Target"
                 value={monthsToTarget > 0 ? `${monthsToTarget} mo` : 'N/A'}
-                subtitle={`Target: $${state.targetIncome.toLocaleString()}/mo`}
+                subtitle="Months to reach target"
               />
             </div>
 
             {/* Revenue Chart */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-4">Revenue Projection</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={projections}>
-                  <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="rgb(59, 130, 246)" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="rgb(59, 130, 246)" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorNetRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="rgb(16, 185, 129)" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="rgb(16, 185, 129)" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgb(71, 85, 105)" />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="rgb(148, 163, 184)"
-                    label={{ value: 'Month', position: 'insideBottom', offset: -5, fill: 'rgb(148, 163, 184)' }}
-                  />
-                  <YAxis 
-                    stroke="rgb(148, 163, 184)"
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'rgb(30, 41, 59)', 
-                      border: '1px solid rgb(71, 85, 105)',
-                      borderRadius: '8px',
-                      color: 'rgb(241, 245, 249)'
-                    }}
-                    formatter={(value: number, name: string) => {
-                      const label = name === 'revenue' ? 'Gross Revenue' : 'Net Revenue (after CAC)';
-                      return [`$${value.toLocaleString()}`, label];
-                    }}
-                  />
-                  <Legend />
-                  <Area 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="rgb(59, 130, 246)" 
-                    fillOpacity={1} 
-                    fill="url(#colorRevenue)"
-                    name="Gross Revenue"
-                  />
-                  <Area 
-                    type="monotone" 
-                    dataKey="netRevenue" 
-                    stroke="rgb(16, 185, 129)" 
-                    fillOpacity={1} 
-                    fill="url(#colorNetRevenue)"
-                    name="Net Revenue"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
+            <div className="bg-card border-2 border-purple-500/50 rounded-xl p-8 shadow-xl">
+              <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+                <span className="text-3xl">📈</span>
+                Revenue Projection
+              </h3>
+              <div className="h-[400px] -mx-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={projections}>
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                      </linearGradient>
+                      <linearGradient id="colorNetRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fill: '#a0aec0' }}
+                      axisLine={{ stroke: '#4a5568' }}
+                      label={{ value: 'Month', position: 'insideBottom', offset: -5, fill: '#a0aec0' }}
+                    />
+                    <YAxis 
+                      tick={{ fill: '#a0aec0' }}
+                      axisLine={{ stroke: '#4a5568' }}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <Tooltip 
+                      formatter={(value, name) => {
+                        const label = name === 'revenue' ? 'Gross Revenue' : 'Net Revenue';
+                        return [`$${Number(value).toLocaleString()}`, label];
+                      }}
+                      labelFormatter={(month) => `Month ${month}`}
+                      contentStyle={{
+                        background: '#1a202c',
+                        border: '1px solid #4a5568',
+                        borderRadius: '0.5rem',
+                      }}
+                    />
+                    <Legend />
+                    <Area 
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      fillOpacity={0.2}
+                      fill="url(#colorRevenue)"
+                      name="Gross Revenue"
+                      activeDot={{ r: 6, fill: '#3b82f6' }}
+                    />
+                    <Area 
+                      type="monotone"
+                      dataKey="netRevenue"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                      fillOpacity={0.2}
+                      fill="url(#colorNetRevenue)"
+                      name="Net Revenue"
+                      activeDot={{ r: 6, fill: '#10b981' }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 text-sm text-muted-foreground text-center">
+                60-Month Projection
+              </div>
             </div>
 
             {/* MRR Chart */}
-            <div className="bg-card border border-border rounded-xl p-6 shadow-lg">
-              <h3 className="text-xl font-bold text-foreground mb-4">Monthly Recurring Revenue</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={projections}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgb(71, 85, 105)" />
-                  <XAxis 
-                    dataKey="month" 
-                    stroke="rgb(148, 163, 184)"
-                    label={{ value: 'Month', position: 'insideBottom', offset: -5, fill: 'rgb(148, 163, 184)' }}
-                  />
-                  <YAxis 
-                    stroke="rgb(148, 163, 184)"
-                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'rgb(30, 41, 59)', 
-                      border: '1px solid rgb(71, 85, 105)',
-                      borderRadius: '8px',
-                      color: 'rgb(241, 245, 249)'
-                    }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, 'MRR']}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="mrr" 
-                    stroke="rgb(16, 185, 129)" 
-                    strokeWidth={3}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="bg-card border-2 border-purple-500/50 rounded-xl p-8 shadow-xl">
+              <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+                <span className="text-3xl">📊</span>
+                Monthly Recurring Revenue
+              </h3>
+              <div className="h-[400px] -mx-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={projections}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
+                    <XAxis 
+                      dataKey="month" 
+                      tick={{ fill: '#a0aec0' }}
+                      axisLine={{ stroke: '#4a5568' }}
+                      label={{ value: 'Month', position: 'insideBottom', offset: -5, fill: '#a0aec0' }}
+                    />
+                    <YAxis 
+                      tick={{ fill: '#a0aec0' }}
+                      axisLine={{ stroke: '#4a5568' }}
+                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                    />
+                    <Tooltip 
+                      formatter={(value) => [`$${Number(value).toLocaleString()}`, 'MRR']}
+                      labelFormatter={(month) => `Month ${month}`}
+                      contentStyle={{
+                        background: '#1a202c',
+                        border: '1px solid #4a5568',
+                        borderRadius: '0.5rem',
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="mrr" 
+                      stroke="#9f7aea" 
+                      strokeWidth={2}
+                      dot={false}
+                      activeDot={{ r: 6, fill: '#9f7aea' }}
+                      name="MRR"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-4 text-sm text-muted-foreground text-center">
+                Monthly Recurring Revenue Over Time
+              </div>
             </div>
 
-            {/* Big Picture Card */}
-            <BigPictureCard metrics={metrics} finalMonth={finalMonth} />
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-card border-2 border-purple-500/50 rounded-xl p-6 shadow-xl">
+                <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <span className="text-2xl">📊</span>
+                  Business Metrics
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <MetricCard
+                    title="Customer LTV"
+                    value={`$${metrics.clv.toLocaleString()}`}
+                    subtitle="Lifetime Value"
+                  />
+                  <MetricCard
+                    title="ARR"
+                    value={`$${metrics.arr.toLocaleString()}`}
+                    subtitle="Annual Recurring Revenue"
+                  />
+                  <MetricCard
+                    title="Valuation"
+                    value={`$${metrics.valuation.toLocaleString()}`}
+                    subtitle="7x ARR"
+                  />
+                  <MetricCard
+                    title="Payback Period"
+                    value={`${metrics.paybackPeriod} mo`}
+                    subtitle="Time to recover CAC"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-card border-2 border-purple-500/50 rounded-xl p-6 shadow-xl">
+                <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                  <span className="text-2xl">📈</span>
+                  Growth Metrics
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <MetricCard
+                    title="LTV:CAC"
+                    value={metrics.ltvCacRatio}
+                    subtitle={metrics.ltvCacRatio >= 3 ? '✅ Healthy' : '⚠️ Needs Attention'}
+                    className={metrics.ltvCacRatio >= 3 ? 'text-green-500' : 'text-yellow-500'}
+                  />
+                  <MetricCard
+                    title="NRR"
+                    value={`${metrics.nrr}%`}
+                    subtitle="Net Revenue Retention"
+                    className={metrics.nrr >= 100 ? 'text-green-500' : 'text-yellow-500'}
+                  />
+                  <MetricCard
+                    title="GRR"
+                    value={`${metrics.grr}%`}
+                    subtitle="Gross Revenue Retention"
+                    className={metrics.grr >= 90 ? 'text-green-500' : 'text-yellow-500'}
+                  />
+                  <MetricCard
+                    title="Rule of 40"
+                    value={`${metrics.ruleOf40}%`}
+                    subtitle={metrics.ruleOf40 >= 40 ? '✅ Excellent' : '📊 Monitor'}
+                    className={metrics.ruleOf40 >= 40 ? 'text-green-500' : 'text-yellow-500'}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Big Picture - Full Width */}
+            <div className="mb-6">
+              <BigPictureCard metrics={metrics} finalMonth={finalMonth} />
+            </div>
+
+            {/* Insights - Full Width */}
+            <div className="mb-6">
+              <InsightsCard metrics={metrics} finalMonth={finalMonth} projections={projections} />
+            </div>
           </div>
         </div>
       </main>
