@@ -18,6 +18,7 @@ interface CalculatorState {
   expansionRevenue: number;
   supportCostPerUser: number;
   infrastructureCostPerUser: number;
+  customersPerMonth: number | null;
 }
 
 interface MonthData {
@@ -56,13 +57,16 @@ const calculateProjections = (
   expansionRate: number,
   supportCost: number,
   infraCost: number,
+  customersPerMonth: number | null = null,
   months: number = 60
 ): MonthData[] => {
   const data: MonthData[] = [];
   
-  const customersNeededPerMonth = avgMonthlyRevenue > 0 
-    ? Math.ceil(targetIncome / avgMonthlyRevenue) 
-    : 0;
+  const customersNeededPerMonth = customersPerMonth !== null 
+    ? customersPerMonth 
+    : avgMonthlyRevenue > 0 
+      ? Math.ceil(targetIncome / avgMonthlyRevenue)
+      : 0;
   
   let totalCustomers = 0;
   let activeCustomers = 0;
@@ -181,6 +185,71 @@ const calculateBusinessMetrics = (
 };
 
 // Components
+const CustomersPerMonthSlider: React.FC<{
+  customersPerMonth: number | null;
+  targetIncome: number;
+  avgMonthlyRevenue: number;
+  enabled?: boolean;
+  onCustomersPerMonthChange: (value: number | null) => void;
+}> = ({ 
+  customersPerMonth, 
+  targetIncome, 
+  avgMonthlyRevenue, 
+  enabled = true,
+  onCustomersPerMonthChange 
+}) => {
+  return (
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-sm font-semibold text-foreground">
+          Customers Per Month
+        </label>
+        {enabled ? (
+          <button
+            onClick={() => onCustomersPerMonthChange(null)}
+            className="text-xs px-2 py-1 rounded bg-secondary border border-border hover:bg-primary/10 transition-colors"
+          >
+            Auto
+          </button>
+        ) : (
+          <button
+            onClick={() => onCustomersPerMonthChange(50)}
+            className="text-xs px-2 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+          >
+            Enable
+          </button>
+        )}
+      </div>
+      {!enabled ? (
+        <div className="p-3 bg-secondary/50 border border-border rounded-lg text-sm text-muted-foreground">
+          Auto-calculated: {avgMonthlyRevenue > 0 ? Math.ceil(targetIncome / avgMonthlyRevenue) : 0} customers/month needed to reach ${targetIncome.toLocaleString()}/month
+        </div>
+      ) : (
+        <>
+          <div className="flex justify-end mb-2">
+            <span className="text-lg font-bold text-primary">
+              {customersPerMonth?.toLocaleString() || 1} customers/month
+            </span>
+          </div>
+          <input
+            type="range"
+            value={customersPerMonth || 1}
+            onChange={(e) => onCustomersPerMonthChange(Number(e.target.value))}
+            min={1}
+            max={500}
+            step={1}
+            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-purple-500"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+            <span>1</span>
+            <span>500</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const SliderField: React.FC<{
   label: string;
   value: number;
@@ -623,6 +692,7 @@ const SaaSCalculator: React.FC = () => {
     plans: [],
     churnRate: 10,
     cac: 100,
+    customersPerMonth: null,
     expansionRevenue: 5,
     supportCostPerUser: 2,
     infrastructureCostPerUser: 3
@@ -652,7 +722,8 @@ const SaaSCalculator: React.FC = () => {
       state.cac,
       state.expansionRevenue,
       state.supportCostPerUser,
-      state.infrastructureCostPerUser
+      state.infrastructureCostPerUser,
+      state.customersPerMonth
     );
     setProjections(data);
     
@@ -719,6 +790,14 @@ const SaaSCalculator: React.FC = () => {
                 max={500}
                 step={10}
                 prefix="$"
+              />
+
+              <CustomersPerMonthSlider
+                customersPerMonth={state.customersPerMonth}
+                targetIncome={state.targetIncome}
+                avgMonthlyRevenue={state.avgMonthlyRevenue}
+                enabled={state.customersPerMonth !== null}
+                onCustomersPerMonthChange={(value) => setState({ ...state, customersPerMonth: value })}
               />
 
               <PlanEditor
