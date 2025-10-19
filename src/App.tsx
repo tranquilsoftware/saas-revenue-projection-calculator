@@ -1,6 +1,49 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
 
+// Header Component
+const Header: React.FC = () => (
+  <header className="bg-slate-900/80 border-b border-slate-800 backdrop-blur-sm sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="flex items-center gap-8">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <img src="https://i.imgur.com/CdnTZ20.png" alt="Tranquil Software Logo" className="w-6 h-6" />
+          </div>
+          <a 
+            href="https://www.tranquilsoftware.com.au" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            Tranquil Software
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+);
+
+// Footer Component
+const Footer: React.FC = () => (
+  <footer className="bg-slate-900 border-t border-slate-800 py-8">
+    <div className="max-w-7xl mx-auto px-6">
+      <p className="text-slate-400 text-sm">
+        © {new Date().getFullYear()}{' '}
+        <a 
+          href="https://www.tranquilsoftware.com.au" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-blue-400 hover:text-blue-300 transition-colors"
+        >
+          Tranquil Software
+        </a>
+        . All rights reserved.
+      </p>
+    </div>
+  </footer>
+);
+
 // Types
 interface Plan {
   id: string;
@@ -741,8 +784,9 @@ const SaaSCalculator: React.FC = () => {
   const monthsToTarget = projections.findIndex(d => d.mrr >= state.targetIncome);
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <main className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <Header />
+      <main className="max-w-7xl mx-auto p-4 md:p-8">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -1035,6 +1079,7 @@ const SaaSCalculator: React.FC = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };
