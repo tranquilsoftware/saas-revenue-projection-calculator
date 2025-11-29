@@ -786,7 +786,7 @@ const SaaSCalculator: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <Header />
-      <main className="max-w-7xl mx-auto p-4 md:p-8">
+      <main className="max-w mx-auto p-4 md:px-16 lg:px-32">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
@@ -889,7 +889,7 @@ const SaaSCalculator: React.FC = () => {
                 <span className="text-3xl">📈</span>
                 Revenue Projection
               </h3>
-              <div className="h-[400px] -mx-2">
+              <div className="h-[400px] -mx-2 pr-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={projections}>
                     <defs>
@@ -912,7 +912,16 @@ const SaaSCalculator: React.FC = () => {
                     <YAxis 
                       tick={{ fill: '#a0aec0' }}
                       axisLine={{ stroke: '#4a5568' }}
-                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                      width={90}
+                      tickMargin={5}
+                      tickFormatter={(value) => {
+                        if (value >= 1000000) {
+                          return `$${(value / 1000000).toFixed(1)}M`;
+                        } else if (value >= 1000) {
+                          return `$${(value / 1000).toFixed(0)}K`;
+                        }
+                        return `$${value}`;
+                      }}
                     />
                     <Tooltip 
                       formatter={(value, name) => {
@@ -962,7 +971,7 @@ const SaaSCalculator: React.FC = () => {
                 <span className="text-3xl">📊</span>
                 Monthly Recurring Revenue
               </h3>
-              <div className="h-[400px] -mx-2">
+              <div className="h-[400px] -mx-2 pr-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={projections}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
@@ -975,7 +984,16 @@ const SaaSCalculator: React.FC = () => {
                     <YAxis 
                       tick={{ fill: '#a0aec0' }}
                       axisLine={{ stroke: '#4a5568' }}
-                      tickFormatter={(value) => `$${value.toLocaleString()}`}
+                      width={90}
+                      tickMargin={5}
+                      tickFormatter={(value) => {
+                        if (value >= 1000000) {
+                          return `$${(value / 1000000).toFixed(1)}M`;
+                        } else if (value >= 1000) {
+                          return `$${(value / 1000).toFixed(0)}K`;
+                        }
+                        return `$${value}`;
+                      }}
                     />
                     <Tooltip 
                       formatter={(value) => [`$${Number(value).toLocaleString()}`, 'MRR']}
