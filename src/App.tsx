@@ -916,7 +916,8 @@ const SaaSCalculator: React.FC = () => {
                     />
                     <Tooltip 
                       formatter={(value, name) => {
-                        const label = name === 'revenue' ? 'Gross Revenue' : 'Net Revenue';
+                        const label = name === 'revenue' ? 'Gross Revenue' : 
+                                     name === 'netRevenue' ? 'Net Revenue' : name;
                         return [`$${Number(value).toLocaleString()}`, label];
                       }}
                       labelFormatter={(month) => `Month ${month}`}
